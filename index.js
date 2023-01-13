@@ -71,6 +71,7 @@ app.get('/rest/:cityid',(req,res)=>{
 )
 
 app.get('/filter',(req,res) => {
+    // console.log(req.query)
     let query = {};
     let sort = {cost:1}
     let mealId = Number(req.query.mealId);
@@ -78,7 +79,7 @@ app.get('/filter',(req,res) => {
     let lcost = Number(req.query.lcost);
     let hcost = Number(req.query.hcost);
     let location = Number(req.query.location)
-
+    // console.log(mealId);
     // console.log(
     //     cuisineId,lcost,hcost,location
     // );
@@ -88,21 +89,14 @@ app.get('/filter',(req,res) => {
 
     if(hcost && lcost && cuisineId){
         query={
-            "mealTypes.mealtype_id":mealId,
-            $and:[{cost:{$gt:lcost,$lt:hcost}}]
-        }
-    }
-    else if(hcost && lcost && cuisineId && location){
-        query={
-            "mealTypes.mealtype_id":mealId,
-            "state_id":location,
             "cuisines.cuisine_id":cuisineId,
+            "mealTypes.mealtype_id":mealId,
             $and:[{cost:{$gt:lcost,$lt:hcost}}]
         }
     }
     else if(hcost && lcost){
         query={
-            // "mealTypes.mealtype_id":mealId,
+            "mealTypes.mealtype_id":mealId,
             $and:[{cost:{$gt:lcost,$lt:hcost}}]
         }
     }
@@ -111,11 +105,13 @@ app.get('/filter',(req,res) => {
             "mealTypes.mealtype_id":mealId,
             "cuisines.cuisine_id":cuisineId
         }
-    }else{
+    }
+    else{
         query={
             "mealTypes.mealtype_id":mealId
         }
     }
+    console.log(query);
     db.collection('restaurantdata').find(query).sort(sort).toArray((err,result) => {
         if(err) throw err;
         res.send(result)
